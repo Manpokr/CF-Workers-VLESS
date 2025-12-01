@@ -1,25 +1,19 @@
-// 相关环境变量(都是可选的)
-// SUB_PATH | subpath  订阅路径
-// PROXYIP | proxyip   代理IP
-// UUID | AUTH | uuid  UUID
-
+// Add New Proxy Cloudflare !!
+// Add New UUID !!
 import { connect } from 'cloudflare:sockets';
 
-let subPath = 'link';     // 订阅路径,不修改将使用uuid作为订阅路径
-let password = '123456';  // 主页密码，建议修改或添加PASSWORD环境变量
-let serverPool = ['13.230.34.30'];  // proxyIP
-let yourUUID = '5dc15e15-f285-4a9d-959b-0e4fbdd77b63'; // UUID，建议修改或添加环境便量
+let subPath = 'link';     // Web Link Vless Json
+let password = '123456';  // Passwd Web Vless
+let serverPool = ['PROXY-CLOUDFLARE'];  // proxyIP
+let yourUUID = 'UUID'; // UUID
 
-let cfip = [ // cfip
-	'ip.sb', 'time.is', 'skk.moe', 'www.visa.com.tw', 'www.visa.com.hk', 'www.visa.com.sg',
-	'cf.090227.xyz','cf.877774.xyz', 'cdns.doon.eu.org', 'cf.zhetengsha.eu.org'
-]; 
+let cfip = [ 'cf.zhetengsha.eu.org' ]; 
 
-let dnsResolver = 'https://sky.rethinkdns.com/1:-Pf_____9_8A_AMAIgE8kMABVDDmKOHTAKg=';
+let dnsResolver = 'https://1.1.1.1/dns-query';
 
 // parse server address and port
 function parseServerAddress(serverStr) {
-	const defaultPort = 443; 
+	const defaultPort = 443; // Port 443 && 80
 	let hostname = serverStr.trim();
 	let port = defaultPort;
 	
@@ -52,7 +46,7 @@ async function resolveHostname(hostname) {
 	
 	try {
 		// use Cloudflare Workers's DNS over HTTPS to resolve hostname
-		const dnsResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${hostname}&type=A`, {
+		const dnsResponse = await fetch(`https://1.1.1.1/dns-query?name=${hostname}&type=A`, {
 			headers: {
 				'Accept': 'application/dns-json'
 			}
@@ -167,7 +161,7 @@ export default {
 							},
 						});
 					case '/connect': // for test connect to cf socket
-						const [hostname, port] = ['cloudflare.com', '80'];
+						const [hostname, port] = ['workers.cloudflare.com', '80'];
 						console.log(`Connecting to ${hostname}:${port}...`);
 
 						try {
@@ -296,11 +290,7 @@ export default {
 							});
 						}
 					default:
-						const randomSites = cfip.length > 0 ? cfip : [
-							'ip.sb', 'time.is', 'www.apple.com', 'skk.moe',
-							'www.visa.com.tw', 'www.github.com', 'www.ups.com',
-							'www.tesla.com', 'www.microsoft.com', 'www.amazon.com'
-						];
+						const randomSites = cfip.length > 0 ? cfip : [ 'www.speedtest.net' ]; // Domain Cloudflare
 						const randomSite = randomSites[Math.floor(Math.random() * randomSites.length)];
 						
 						const Url = new URL(`https://${randomSite}${url.pathname}${url.search}`);
@@ -853,8 +843,8 @@ function getVLConfig(yourUUID, url) {
 	const wsPath = '/?ed=2560';
 	const encodedPath = encodeURIComponent(wsPath);
 	const addresses = Array.isArray(cfip) ? cfip : [cfip];
-	const header = 'v-l-e-s-s';
-	const configs = addresses.map(addr => `${header}://${yourUUID}@${addr}:443?encryption=none&security=tls&sni=${url}&fp=chrome&type=ws&host=${url}&path=${encodedPath}#Workers-service`);
+	const header = 'vless';
+	const configs = addresses.map(addr => `${header}://${yourUUID}@${addr}:443?path=${encodedPath}&security=tls&encryption=none&type=ws&sni=${url}&host=${url}#Workers-service`);
 	return configs.join('\n').replace(new RegExp(header, 'g'), 'v' + 'l' + 'e' + 's' + 's');
 }
 
@@ -1446,7 +1436,7 @@ function getMainPageContent(url, baseUrl) {
                 <span class="value"><span class="status"></span>运行中</span>
             </div>
             <div class="info-item">
-                <span class="label">主机地址</span>
+                <span class="label">Domain Workers</span>
                 <span class="value">${url}</span>
             </div>
             <div class="info-item">
@@ -1454,15 +1444,15 @@ function getMainPageContent(url, baseUrl) {
                 <span class="value">${yourUUID}</span>
             </div>
             <div class="info-item">
-                <span class="label">base64订阅地址</span>
+                <span class="label">Vless base64</span>
                 <span class="value">${baseUrl}/${subPath}</span>
             </div>
             <div class="info-item">
-                <span class="label">Clash订阅地址</span>
+                <span class="label">Vless Clash</span>
                 <span class="value">https://sublink.eooce.com/clash?config=${baseUrl}/${subPath}</span>
             </div>
             <div class="info-item">
-                <span class="label">singbox订阅地址</span>
+                <span class="label">Vless singbox</span>
                 <span class="value">https://sublink.eooce.com/singbox?config=${baseUrl}/${subPath}</span>
             </div>
         </div>
